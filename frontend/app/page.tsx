@@ -102,7 +102,7 @@ const Home = () => {
 					/>
 				</div>
 				<div className="w-1/2 flex flex-col">
-					<div className="h-10 border-b border-white/10 bg-[#1e1e1e] flex items-center justify-between px-4">
+					<div className="flex-shrink-0 border-b border-white/10 bg-[#1e1e1e] flex items-center justify-between px-4" style={{ height: 40 }}>
 						<span className="text-xs font-medium text-white/70">Connection Graph</span>
 						<div className="text-xs text-white/40">
 							{graphData?.elements.filter(e => !e.data.source).length || 0} nodes &middot;{" "}
