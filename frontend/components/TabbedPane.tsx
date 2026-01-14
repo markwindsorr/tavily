@@ -62,14 +62,14 @@ const TabbedPane = ({ onGraphUpdate, openPapers, onClosePaper, selectedTabId, on
 
 	return (
 		<div className="flex flex-col h-full">
-			<div className="h-10 flex items-center bg-[#1a1a1a] border-b border-white/10 overflow-x-auto">
+			<div className="flex-shrink-0 flex items-end bg-[#1a1a1a] border-b border-white/10 overflow-x-auto" style={{ height: 40 }}>
 				{tabs.map(tab => (
 					<div
 						key={tab.id}
 						onClick={() => handleTabClick(tab.id)}
-						className={`flex items-center gap-2 px-4 py-2 text-xs font-medium border-r border-white/5 transition-colors min-w-0 cursor-pointer ${
+						className={`flex items-center gap-2 px-4 h-full text-xs font-medium border-r border-white/5 transition-colors min-w-0 cursor-pointer ${
 							activeTabId === tab.id
-								? "bg-[#1e1e1e] text-white border-b-2 border-b-[#4A9D9A] mb-[-2px] pb-[10px]"
+								? "bg-[#1e1e1e] text-white border-b-2 border-b-[#4A9D9A]"
 								: "text-white/50 hover:text-white/80 hover:bg-white/5"
 						}`}
 					>

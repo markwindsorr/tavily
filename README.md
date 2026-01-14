@@ -14,6 +14,57 @@ Papers are nodes, citations/references or semantic links that are found are your
 -   Tavily API key
 -   Supabase project
 
+---
+
+## Backend
+
+The backend uses LangGraph to orchestrate a pipeline of AI agents. The workflow is defined in `backend/graph.py`:
+
+1. **Router Agent** (`agents/router.py`) - Classifies user intent into: `add_paper`, `search_paper`, `find_related`, `find_connections`, `extract`, `crawl`, `map`, or `question`
+
+2. **Specialized Agents** - Each handles a specific task:
+
+    - `ingest` - Fetches papers from arXiv
+    - `search` - Searches for papers
+    - `citation` - Finds and creates citation links
+    - `extract` - Extracts knowledge from PDFs
+    - `crawl` - Crawls web pages for paper references
+    - `map` - Maps URLs from pages
+    - `related` - Finds related papers
+    - `answer` - Answers general questions
+
+3. **Synthesis Agent** (`agents/synthesis.py`) - Generates final response and builds Cytoscape graph data
+
+State flows through `ResearchGraphState` (defined in `backend/state.py`) which accumulates papers, edges, and responses.
+
+Uses AWS Bedrock with Claude Opus 4.5 (`us.anthropic.claude-opus-4-5-20251101-v1:0`).
+
+### Data Models
+
+Core models in `backend/models.py`:
+
+-   `Paper` - Academic paper with id (arXiv ID), title, authors, summary, citations
+-   `Edge` - Simple connection between papers (source_id, target_id)
+-   `GraphData` - Collection of nodes (papers) and edges
+
+### LLM Integration
+
+All LLM calls go through `agents/base.py`:
+
+-   `invoke_bedrock(prompt)` - Text-only prompts
+-   `invoke_bedrock_with_pdf(prompt, pdf_bytes)` - Document understanding
+
+---
+
+### Frontend
+
+Next.js 16 app with React 19. Key components:
+
+-   `components/GraphView.tsx` - Cytoscape graph visualization
+-   `components/Chat.tsx` - Chat interface for interacting with agents
+-   `components/TabbedPane.tsx` - Paper details in tabs
+-   `lib/api.ts` - API client for backend communication
+
 ## Setup
 
 ### 1. Backend
@@ -49,12 +100,3 @@ cd frontend
 npm install
 npm run dev
 ```
-
-## Usage
-
-There will be an exclusive chip selection of the main research categories on arxiv that shows sample prompts relating to the selected category and
-
--   Type an arXiv ID (e.g., `2401.12345`) or paper title to add papers
--   Ask questions like "Find papers related to transformers"
--   Click nodes in the graph to view paper details
--   Use the sidebar to browse added papers
