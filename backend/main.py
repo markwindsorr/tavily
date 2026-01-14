@@ -108,14 +108,10 @@ async def select_paper(request: SelectPaperRequest):
         )
 
         if not edge_exists:
-            source_paper = storage.get_paper(request.source_paper_id)
-            source_title = source_paper.title if source_paper else request.source_paper_id
             citation_edge = Edge(
                 id=str(uuid.uuid4()),
                 source_id=request.source_paper_id,
-                target_id=added_paper_id,
-                edge_type="citation",
-                evidence=f"Cited in references of '{source_title}'"
+                target_id=added_paper_id
             )
             storage.add_edge(citation_edge)
             citation_edges.append(citation_edge)
@@ -216,7 +212,6 @@ async def get_related_papers(paper_id: str):
 async def create_batch_edges(request: dict):
     source_id = request.get("source_id")
     target_ids = request.get("target_ids", [])
-    edge_type = request.get("edge_type", "manual")
 
     if not source_id or not target_ids:
         raise HTTPException(status_code=400, detail="source_id and target_ids required")
@@ -234,9 +229,7 @@ async def create_batch_edges(request: dict):
         edge = Edge(
             id=str(uuid.uuid4()),
             source_id=source_id,
-            target_id=target_id,
-            edge_type=edge_type,
-            evidence="Connected by user"
+            target_id=target_id
         )
         storage.add_edge(edge)
         edges_created.append(edge)

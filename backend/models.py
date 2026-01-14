@@ -2,8 +2,6 @@ from pydantic import BaseModel
 from typing import List, Optional, Literal
 from datetime import datetime
 
-EdgeType = Literal["citation", "shared_concepts", "manual"]
-
 Role = Literal["user", "assistant"]
 
 
@@ -36,8 +34,6 @@ class Edge(BaseModel):
     id: str
     source_id: str
     target_id: str
-    edge_type: EdgeType
-    evidence: Optional[str] = None
     created_at: Optional[datetime] = None
 
 

@@ -21,8 +21,6 @@ export interface Edge {
 	id: string
 	source_id: string
 	target_id: string
-	edge_type: string
-	evidence?: string
 }
 
 export interface PaperCandidate {

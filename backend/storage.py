@@ -39,8 +39,6 @@ class Storage:
             "id": edge.id,
             "source_id": edge.source_id,
             "target_id": edge.target_id,
-            "edge_type": edge.edge_type,
-            "evidence": edge.evidence,
         }
         self.client.table("edges").upsert(data).execute()
         return edge
@@ -96,8 +94,6 @@ class Storage:
             id=row["id"],
             source_id=row["source_id"],
             target_id=row["target_id"],
-            edge_type=row["edge_type"],
-            evidence=row.get("evidence"),
             created_at=datetime.fromisoformat(row["created_at"].replace("Z", "+00:00")) if row.get("created_at") else None,
         )
 

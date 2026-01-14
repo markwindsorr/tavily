@@ -66,30 +66,11 @@ const GraphView = ({ graphData, onNodeClick, onEdgeDelete }: GraphViewProps) => 
 						selector: "edge",
 						style: {
 							width: 2,
-							"line-color": "#555",
-							"target-arrow-color": "#555",
+							"line-color": "#4A9D9A",
+							"target-arrow-color": "#4A9D9A",
 							"target-arrow-shape": "triangle",
 							"curve-style": "bezier",
-							label: "data(label)",
-							"font-size": "8px",
-							color: "#888",
-							"text-rotation": "autorotate",
 							events: "yes"
-						}
-					},
-					{
-						selector: "edge[edge_type='citation']",
-						style: {
-							"line-color": "#4A9D9A",
-							"target-arrow-color": "#4A9D9A"
-						}
-					},
-					{
-						selector: "edge[edge_type='semantic']",
-						style: {
-							"line-color": "#8B5CF6",
-							"target-arrow-color": "#8B5CF6",
-							"line-style": "dashed"
 						}
 					},
 					{
@@ -191,36 +172,21 @@ const GraphView = ({ graphData, onNodeClick, onEdgeDelete }: GraphViewProps) => 
 					<Maximize2 className="w-4 h-4" />
 				</button>
 			</div>
-			<div className="absolute bottom-4 left-4 bg-[#2a2a2a] border border-white/10 p-3 rounded text-xs">
-				<p className="font-medium mb-2 text-white/70">Legend</p>
-				<div className="flex items-center gap-2 mb-1 text-white/60">
-					<div className="w-4 h-0.5 bg-[#4A9D9A]" />
-					<span>Citation</span>
-				</div>
-				<div className="flex items-center gap-2 text-white/60">
-					<div className="w-4 h-0.5 bg-purple-500 border-dashed" />
-					<span>Semantic</span>
-				</div>
-			</div>
 			{selectedEdge && (
 				<div className="absolute bottom-4 right-4 bg-[#2a2a2a] border border-white/10 p-3 rounded max-w-xs">
 					<div className="flex justify-between items-start">
-						<p className="font-medium text-sm text-white/90">Connection Details</p>
+						<p className="font-medium text-sm text-white/90">Connection</p>
 						<button onClick={() => setSelectedEdge(null)} className="text-white/40 hover:text-white/60">
 							&times;
 						</button>
 					</div>
-					<p className="text-xs text-white/50 mt-1">Type: {String(selectedEdge.edge_type)}</p>
-					{selectedEdge.evidence ? (
-						<p className="text-xs text-white/70 mt-2">{String(selectedEdge.evidence)}</p>
-					) : null}
 					{onEdgeDelete && selectedEdge.id ? (
 						<button
 							onClick={() => {
 								onEdgeDelete(String(selectedEdge.id))
 								setSelectedEdge(null)
 							}}
-							className="mt-3 flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300"
+							className="mt-2 flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300"
 						>
 							<Trash2 className="w-3 h-3" />
 							Delete connection
