@@ -33,7 +33,7 @@ def build_edges_context(edges: list, papers: list) -> str:
         source_title = paper_map.get(edge.source_id, edge.source_id)
         target_title = paper_map.get(edge.target_id, edge.target_id)
         context_parts.append(
-            f"- {source_title[:50]} -> {target_title[:50]} ({edge.edge_type})"
+            f"- {source_title[:50]} -> {target_title[:50]}"
         )
     return "\n".join(context_parts)
 

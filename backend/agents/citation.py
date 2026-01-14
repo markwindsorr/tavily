@@ -26,9 +26,7 @@ def find_concept_connections(
             edge = Edge(
                 id=str(uuid.uuid4()),
                 source_id=paper.id,
-                target_id=other.id,
-                edge_type="shared_concepts",
-                evidence=f"Shared concepts: {', '.join(shared)}"
+                target_id=other.id
             )
             edges.append(edge)
             storage.add_edge(edge)

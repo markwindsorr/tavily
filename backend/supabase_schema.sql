@@ -12,9 +12,6 @@ CREATE TABLE IF NOT EXISTS edges (
     id TEXT PRIMARY KEY,
     source_id TEXT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
     target_id TEXT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
-    edge_type TEXT NOT NULL,  
-    evidence TEXT,
-    strength FLOAT DEFAULT 1.0,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

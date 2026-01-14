@@ -26,9 +26,6 @@ def build_cytoscape_graph(graph_data: GraphData) -> dict:
                 "id": edge.id,
                 "source": edge.source_id,
                 "target": edge.target_id,
-                "label": edge.edge_type,
-                "edge_type": edge.edge_type,
-                "evidence": edge.evidence,
             }
         })
 

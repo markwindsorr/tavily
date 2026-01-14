@@ -48,8 +48,7 @@ class TestBuildCytoscapeGraph:
                        published=datetime(2024, 1, 1), pdf_url="u", key_concepts=[])
         paper2 = Paper(id="p2", title="P2", authors=["B"], summary="S",
                        published=datetime(2024, 1, 2), pdf_url="u", key_concepts=[])
-        edge = Edge(id="e1", source_id="p1", target_id="p2",
-                    edge_type="shared_concepts")
+        edge = Edge(id="e1", source_id="p1", target_id="p2")
         result = build_cytoscape_graph(
             GraphData(nodes=[paper1, paper2], edges=[edge]))
         assert len(result["elements"]) == 3

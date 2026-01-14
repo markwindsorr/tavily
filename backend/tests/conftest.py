@@ -57,9 +57,7 @@ def sample_edge(sample_paper, sample_paper_2):
     return Edge(
         id="edge-001",
         source_id=sample_paper.id,
-        target_id=sample_paper_2.id,
-        edge_type="shared_concepts",
-        evidence="Shared concepts: transformers"
+        target_id=sample_paper_2.id
     )
 
 
