@@ -2,8 +2,7 @@
 
 A full-stack application for discovering and visualizing relationships between academic papers from arXiv. Chat with an AI agent using the Tavily APIs (search, extract, crawl, map) and AWS Bedrock using Opus 4.5 to add papers, find citations, and explore connection graphs.
 
-There is no authentication, we are persisting chat conversations and uploaded papers and edges. This was necessary because the goal of the application is to use the agents to build a knowledge graph of connected papers and to be able to find connections between papers you might not have otherwise found. Without persistence, your chat and graph is gone on shut down and refresh.
-
+There is no authentication, we are persisting chat conversations and uploaded papers and edges. This was necessary because the goal of the application is to use the agents to build a knowledge graph of connected papers and to be able to find connections between papers you might not have otherwise found. Without persistence, obviously your chat and graph is gone on refresh or shut down
 Papers are nodes, citations/references or semantic links that are found are your edges.
 
 ## Using
