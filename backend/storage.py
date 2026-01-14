@@ -1,7 +1,7 @@
 from typing import List, Optional
 from datetime import datetime
 from supabase import create_client, Client
-from models import Paper, Edge, GraphData, Citation
+from models import Paper, Edge, GraphData, Citation, ChatMessage, Role
 from config import SUPABASE_URL, SUPABASE_KEY
 
 
@@ -60,12 +60,19 @@ class Storage:
         self.client.table("edges").delete().eq("target_id", paper_id).execute()
         self.client.table("papers").delete().eq("id", paper_id).execute()
 
-    def add_chat_message(self, role: str, content: str):
+    def add_chat_message(self, role: Role, content: str):
         self.client.table("chat_history").insert({"role": role, "content": content}).execute()
 
-    def get_chat_history(self) -> List[dict]:
+    def get_chat_history(self) -> List[ChatMessage]:
         result = self.client.table("chat_history").select("*").order("created_at").execute()
-        return result.data
+        return [self._row_to_chat_message(row) for row in result.data]
+
+    def _row_to_chat_message(self, row: dict) -> ChatMessage:
+        return ChatMessage(
+            role=row["role"],
+            content=row["content"],
+            created_at=datetime.fromisoformat(row["created_at"].replace("Z", "+00:00")) if row.get("created_at") else None,
+        )
 
     def clear_chat_history(self):
         self.client.table("chat_history").delete().not_.is_("id", "null").execute()
