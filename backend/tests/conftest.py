@@ -1,11 +1,26 @@
+import os
 import sys
 from pathlib import Path
 from datetime import datetime
 from unittest.mock import MagicMock
-import pytest
 
+# Set dummy env vars before any imports that need them
+os.environ.setdefault("SUPABASE_URL", "https://test.supabase.co")
+os.environ.setdefault("SUPABASE_KEY", "test-key-for-testing-only")
+os.environ.setdefault("TAVILY_API_KEY", "test-tavily-key")
+os.environ.setdefault("AWS_ACCESS_KEY_ID", "test")
+os.environ.setdefault("AWS_SECRET_ACCESS_KEY", "test")
+os.environ.setdefault("AWS_DEFAULT_REGION", "us-east-1")
+
+# Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# Mock supabase.create_client before storage imports it
+_mock_supabase = MagicMock()
+sys.modules['supabase'] = _mock_supabase
+_mock_supabase.create_client = MagicMock(return_value=MagicMock())
+
+import pytest
 from models import Paper, Edge, GraphData
 
 

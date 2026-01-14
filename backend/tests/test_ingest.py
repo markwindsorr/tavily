@@ -1,4 +1,3 @@
-
 from unittest.mock import patch, MagicMock
 
 
@@ -35,11 +34,16 @@ class TestIngestAgent:
                 patch("agents.ingest.extract_arxiv_id") as mock_extract:
             mock_extract.return_value = None
             mock_bedrock.return_value = "attention paper"
+
+            # Create mock arxiv result with proper author structure
+            mock_author = MagicMock()
+            mock_author.name = "Vaswani"
+
             mock_result = MagicMock()
             mock_result.get_short_id.return_value = "1706.03762"
-            mock_result.title = "Attention"
-            mock_result.authors = [MagicMock(name="A")]
-            mock_result.published = MagicMock(year=2017)
+            mock_result.title = "Attention Is All You Need"
+            mock_result.authors = [mock_author]
+            mock_result.published.year = 2017
             mock_search.return_value = [mock_result]
 
             from agents.ingest import ingest_agent
@@ -58,11 +62,15 @@ class TestSearchPapersAgent:
             mock_tavily.search.return_value = {
                 "results": [{"url": "https://arxiv.org/abs/2401.00001", "title": "Paper"}]
             }
+
+            mock_author = MagicMock()
+            mock_author.name = "Author"
+
             mock_result = MagicMock()
             mock_result.get_short_id.return_value = "2401.00001"
             mock_result.title = "Paper"
-            mock_result.authors = [MagicMock(name="A")]
-            mock_result.published = MagicMock(year=2024)
+            mock_result.authors = [mock_author]
+            mock_result.published.year = 2024
             mock_arxiv.return_value = [mock_result]
 
             from agents.ingest import search_papers_agent

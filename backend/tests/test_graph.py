@@ -1,4 +1,3 @@
-
 from unittest.mock import MagicMock
 
 
@@ -34,4 +33,6 @@ class TestCreateWorkflow:
         from graph import create_workflow
         workflow = create_workflow()
         assert workflow is not None
-        assert hasattr(workflow, "invoke")
+        # create_workflow returns StateGraph, compile() gives the runnable app
+        compiled = workflow.compile()
+        assert hasattr(compiled, "invoke")
