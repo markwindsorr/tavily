@@ -100,3 +100,12 @@ cd frontend
 npm install
 npm run dev
 ```
+
+---
+
+### Improvements
+
+Creating better semantic understanding when finding connections among papers. Right now, when we use the ingest agent, the LLM extracts out 3-5 key concepts from the papers title and abstract. These are used to compare amongst added papers so there is:
+
+1. No semantic understanding when finding links.
+2. Depends on LLM consistency of the key concept tags.
