@@ -3,8 +3,10 @@ from config import AWS_DEFAULT_REGION
 
 bedrock = boto3.client("bedrock-runtime", region_name=AWS_DEFAULT_REGION)
 
-# Model - Claude Opus 4.5
-MODEL_ID = "us.anthropic.claude-opus-4-5-20251101-v1:0"
+# Model - Claude Opus 4.5 (was down when making demo video)
+# MODEL_ID = "us.anthropic.claude-opus-4-5-20251101-v1:0"
+
+MODEL_ID = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 
 
 def invoke_bedrock(prompt: str, max_tokens: int = 500, temperature: float = 0.7) -> str:

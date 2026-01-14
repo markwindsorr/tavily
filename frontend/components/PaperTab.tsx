@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Paper, Citation, PaperCandidate, selectPaper } from "@/lib/api"
-import { FileText, Download, Plus, Loader2, X, ChevronRight } from "lucide-react"
+import { Plus, Loader2, X, ChevronRight } from "lucide-react"
 
 interface PaperTabProps {
 	paper: Paper
@@ -10,7 +10,6 @@ interface PaperTabProps {
 }
 
 const PaperTab = ({ paper, onGraphUpdate }: PaperTabProps) => {
-	const [viewMode, setViewMode] = useState<"markdown" | "pdf">("markdown")
 	const [addingCitation, setAddingCitation] = useState<string | null>(null)
 	const [addedCitations, setAddedCitations] = useState<Set<string>>(new Set())
 	const [candidates, setCandidates] = useState<{ citation: Citation; options: PaperCandidate[] } | null>(null)
@@ -63,28 +62,6 @@ const PaperTab = ({ paper, onGraphUpdate }: PaperTabProps) => {
 
 	return (
 		<div className="h-full flex flex-col bg-[#1e1e1e]">
-			<div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#1a1a1a]">
-				<div className="flex items-center gap-1 bg-white/5 rounded-lg p-0.5">
-					<button
-						onClick={() => setViewMode("markdown")}
-						className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
-							viewMode === "markdown" ? "bg-[#4A9D9A] text-white" : "text-white/50 hover:text-white/80"
-						}`}
-					>
-						<FileText className="w-3 h-3 inline mr-1" />
-						Details
-					</button>
-					<button
-						onClick={() => setViewMode("pdf")}
-						className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
-							viewMode === "pdf" ? "bg-[#4A9D9A] text-white" : "text-white/50 hover:text-white/80"
-						}`}
-					>
-						<Download className="w-3 h-3 inline mr-1" />
-						PDF
-					</button>
-				</div>
-			</div>
 			<div className="flex-1 overflow-y-auto p-6">
 				<article className="prose prose-invert prose-sm max-w-none">
 					<h1 className="text-xl font-bold text-white/90 mb-4">{paper.title}</h1>
