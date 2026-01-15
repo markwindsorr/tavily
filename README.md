@@ -5,6 +5,37 @@ A full-stack application for discovering and visualizing relationships between a
 There is no authentication, we are persisting chat conversations and uploaded papers and edges. This was necessary because the goal of the application is to use the agents to build a knowledge graph of connected papers and to be able to find connections between papers you might not have otherwise found. Without persistence, obviously your chat and graph is gone on refresh or shut down
 Papers are nodes, citations/references or semantic links that are found are your edges.
 
+## Sumary of Tavily API Methods
+
+1. search(query)
+
+-   query: the serch query string
+-   response_time: the time taken for the search
+-   results: List of search results, each containing url, title, and content snippets
+-   answer: optional ai generated answer (none if not requests)
+-   images: list of related iamges
+-   follow_up_questions: suggested follow up queries
+
+2. extract(url)
+
+Extracts content from a specific url and returns
+
+-   results: list of containing extracted data with url, title and raw content (full page text)
+
+3. crawl(base_url, instructions)
+
+Crawls a website following specific instructions and returns:
+
+-   base_url: the string url for the crawl
+-   results: list of pages matching the insstructions, each with url and raw_content
+
+4. map(base_url)
+
+Maps/discovers all URLS on a website and returns:
+
+-   base_url: the starting URL
+-   results: list of all discovered URLS on the site (sitemap-like output)
+
 ## Using
 
 -   Python 3.10+

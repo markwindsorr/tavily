@@ -39,7 +39,6 @@ def build_edges_context(edges: list, papers: list) -> str:
 
 
 def search_for_answer(question: str, papers: list) -> dict:
-
     paper_concepts = []
     for paper in papers[:3]:  # Limit to 3 papers for query
         paper_concepts.extend(paper.key_concepts[:2])

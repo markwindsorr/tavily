@@ -134,6 +134,8 @@ def ingest_agent(state: dict) -> dict:
 
 def search_papers_with_tavily(query: str, max_results: int = 5) -> List[dict]:
     try:
+
+        # search_depth: Literal["basic", "advanced", "fast", "ultra-fast"] = None
         result = tavily.search(
             query=f"{query} research paper",
             include_domains=["arxiv.org"],
