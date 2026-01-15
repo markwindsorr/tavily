@@ -298,6 +298,13 @@ Run the API:
 uvicorn main:app --reload --port 8000
 ```
 
+Run tests:
+
+```bash
+cd backend
+pytest -v
+```
+
 ### 2. Frontend
 
 ```bash

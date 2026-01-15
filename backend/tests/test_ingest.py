@@ -1,6 +1,46 @@
 from unittest.mock import patch, MagicMock
 
 
+class TestExtractReferencesFromPdf:
+    def test_extracts_references_from_json(self):
+        with patch("agents.ingest.download_pdf") as mock_dl, \
+                patch("agents.ingest.invoke_bedrock_with_pdf") as mock_bedrock:
+            mock_dl.return_value = b"pdf bytes"
+            mock_bedrock.return_value = '[{"title": "Test Paper", "arxiv_id": "1234.5678", "author": "Smith"}]'
+
+            from agents.ingest import extract_references_from_pdf
+            refs = extract_references_from_pdf("http://example.com/paper.pdf")
+
+            assert len(refs) == 1
+            assert refs[0].title == "Test Paper"
+            assert refs[0].arxiv_id == "1234.5678"
+            assert refs[0].author == "Smith"
+
+    def test_returns_empty_on_invalid_json(self):
+        with patch("agents.ingest.download_pdf") as mock_dl, \
+                patch("agents.ingest.invoke_bedrock_with_pdf") as mock_bedrock:
+            mock_dl.return_value = b"pdf bytes"
+            mock_bedrock.return_value = "not valid json"
+
+            from agents.ingest import extract_references_from_pdf
+            refs = extract_references_from_pdf("http://example.com/paper.pdf")
+
+            assert refs == []
+
+    def test_limits_to_10_references(self):
+        with patch("agents.ingest.download_pdf") as mock_dl, \
+                patch("agents.ingest.invoke_bedrock_with_pdf") as mock_bedrock:
+            mock_dl.return_value = b"pdf bytes"
+            refs_json = [{"title": f"Paper {i}", "arxiv_id": f"1234.{i:04d}", "author": "A"} for i in range(15)]
+            import json
+            mock_bedrock.return_value = json.dumps(refs_json)
+
+            from agents.ingest import extract_references_from_pdf
+            refs = extract_references_from_pdf("http://example.com/paper.pdf")
+
+            assert len(refs) == 10
+
+
 class TestIngestAgent:
     def test_ingest_with_arxiv_id(self):
         with patch("agents.ingest.storage") as mock_storage, \
