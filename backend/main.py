@@ -3,10 +3,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
-from models import Paper, ChatRequest, ChatResponse, AddPaperRequest, GraphData, SelectPaperRequest, Edge, PaperCandidate
+from models import Paper, ChatRequest, ChatResponse, AddPaperRequest, GraphData, SelectPaperRequest, Edge
 from storage import storage
 from graph import run_pipeline
-from agents.utils import extract_arxiv_id, search_arxiv_by_name
+from agents.utils import extract_arxiv_id
 from agents.ingest import fetch_paper_from_arxiv
 from agents.synthesis import build_cytoscape_graph
 
@@ -52,13 +52,15 @@ async def get_paper(paper_id: str):
 
 @app.post("/papers/select", response_model=ChatResponse)
 async def select_paper(request: SelectPaperRequest):
+    """Add a paper by arXiv ID and optionally link it to a source paper."""
     papers_added = []
-    citation_edges = []
     error_message = None
 
     arxiv_id = extract_arxiv_id(request.arxiv_id)
 
-    if arxiv_id:
+    if not arxiv_id:
+        error_message = f"Invalid arXiv ID: {request.arxiv_id}"
+    else:
         existing = storage.get_paper(arxiv_id)
         if existing:
             papers_added = [existing.id]
@@ -69,35 +71,9 @@ async def select_paper(request: SelectPaperRequest):
                 papers_added = [paper.id]
             except Exception as e:
                 error_message = f"Could not fetch paper: {str(e)}"
-    else:
-        try:
-            results = search_arxiv_by_name(f'ti:"{request.arxiv_id}"', max_results=5)
-            if not results:
-                results = search_arxiv_by_name(request.arxiv_id, max_results=5)
 
-            if results:
-                candidates = [
-                    PaperCandidate(
-                        arxiv_id=r.get_short_id(),
-                        title=r.title,
-                        authors=[a.name for a in r.authors[:3]],
-                        year=r.published.year,
-                        source_paper_id=request.source_paper_id
-                    )
-                    for r in results
-                ]
-                return ChatResponse(
-                    message=f"Found {len(candidates)} papers. Select the correct one:",
-                    graph_updated=False,
-                    papers_added=[],
-                    paper_candidates=candidates
-                )
-            else:
-                error_message = f"No papers found matching '{request.arxiv_id}'"
-        except Exception as e:
-            error_message = f"Search failed: {str(e)}"
-
-    citation_created = False
+    # Create edge linking source paper to added paper
+    edge_created = False
     if request.source_paper_id and papers_added:
         added_paper_id = papers_added[0]
         existing_edges = storage.get_edges()
@@ -108,29 +84,28 @@ async def select_paper(request: SelectPaperRequest):
         )
 
         if not edge_exists:
-            citation_edge = Edge(
+            edge = Edge(
                 id=str(uuid.uuid4()),
                 source_id=request.source_paper_id,
                 target_id=added_paper_id
             )
-            storage.add_edge(citation_edge)
-            citation_edges.append(citation_edge)
-            citation_created = True
+            storage.add_edge(edge)
+            edge_created = True
 
-    graph_updated = bool(papers_added) or bool(citation_edges)
+    graph_updated = bool(papers_added) or edge_created
 
     if error_message:
-        base_message = error_message
+        message = error_message
     elif papers_added:
         added_paper = storage.get_paper(papers_added[0])
-        base_message = f"Added: {added_paper.title}" if added_paper else "Paper added."
-        if citation_created:
-            base_message += " (linked as citation)"
+        message = f"Added: {added_paper.title}" if added_paper else "Paper added."
+        if edge_created:
+            message += " (linked)"
     else:
-        base_message = "No paper was added."
+        message = "No paper was added."
 
     response = ChatResponse(
-        message=base_message,
+        message=message,
         graph_updated=graph_updated,
         papers_added=papers_added
     )
@@ -187,54 +162,6 @@ async def get_chat_history():
 async def clear_chat_history():
     storage.clear_chat_history()
     return {"message": "Chat history cleared"}
-
-
-@app.get("/papers/{paper_id}/related")
-async def get_related_papers(paper_id: str):
-    paper = storage.get_paper(paper_id)
-    if not paper:
-        raise HTTPException(status_code=404, detail="Paper not found")
-
-    all_papers = storage.get_all_papers()
-    existing_edges = storage.get_edges()
-
-    connected_ids = set()
-    for edge in existing_edges:
-        if edge.source_id == paper_id:
-            connected_ids.add(edge.target_id)
-        elif edge.target_id == paper_id:
-            connected_ids.add(edge.source_id)
-
-    return [p for p in all_papers if p.id != paper_id and p.id not in connected_ids]
-
-
-@app.post("/edges/batch")
-async def create_batch_edges(request: dict):
-    source_id = request.get("source_id")
-    target_ids = request.get("target_ids", [])
-
-    if not source_id or not target_ids:
-        raise HTTPException(status_code=400, detail="source_id and target_ids required")
-
-    source_paper = storage.get_paper(source_id)
-    if not source_paper:
-        raise HTTPException(status_code=404, detail="Source paper not found")
-
-    edges_created = []
-    for target_id in target_ids:
-        target_paper = storage.get_paper(target_id)
-        if not target_paper:
-            continue
-
-        edge = Edge(
-            id=str(uuid.uuid4()),
-            source_id=source_id,
-            target_id=target_id
-        )
-        storage.add_edge(edge)
-        edges_created.append(edge)
-
-    return {"edges_created": len(edges_created)}
 
 
 @app.delete("/papers/{paper_id}")

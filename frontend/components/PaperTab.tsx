@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Paper, Citation, PaperCandidate, selectPaper } from "@/lib/api"
-import { Plus, Loader2, X, ChevronRight } from "lucide-react"
+import { Paper, Reference, selectPaper } from "@/lib/api"
+import { Plus, Loader2 } from "lucide-react"
 
 interface PaperTabProps {
 	paper: Paper
@@ -10,45 +10,21 @@ interface PaperTabProps {
 }
 
 const PaperTab = ({ paper, onGraphUpdate }: PaperTabProps) => {
-	const [addingCitation, setAddingCitation] = useState<string | null>(null)
-	const [addedCitations, setAddedCitations] = useState<Set<string>>(new Set())
-	const [candidates, setCandidates] = useState<{ citation: Citation; options: PaperCandidate[] } | null>(null)
+	const [addingReference, setAddingReference] = useState<string | null>(null)
+	const [addedReferences, setAddedReferences] = useState<Set<string>>(new Set())
 
-	const handleAddCitation = async (citation: Citation) => {
-		const citationKey = citation.arxiv_id || citation.title
-		setAddingCitation(citationKey)
-		setCandidates(null)
+	const handleAddReference = async (reference: Reference) => {
+		setAddingReference(reference.arxiv_id)
 		try {
-			const response = await selectPaper(citation.arxiv_id || citation.title, paper.id)
+			const response = await selectPaper(reference.arxiv_id, paper.id)
 			if (response.papers_added?.length > 0) {
-				setAddedCitations(prev => new Set(prev).add(citationKey))
-				onGraphUpdate?.()
-			} else if (response.paper_candidates?.length > 0) {
-				setCandidates({ citation, options: response.paper_candidates })
-			}
-		} catch (error) {
-			console.error("Failed to add citation:", error)
-		} finally {
-			setAddingCitation(null)
-		}
-	}
-
-	const handleSelectCandidate = async (candidate: PaperCandidate) => {
-		setAddingCitation(candidate.arxiv_id)
-		try {
-			const response = await selectPaper(candidate.arxiv_id, paper.id)
-			if (response.papers_added?.length > 0) {
-				if (candidates?.citation) {
-					const citationKey = candidates.citation.arxiv_id || candidates.citation.title
-					setAddedCitations(prev => new Set(prev).add(citationKey))
-				}
+				setAddedReferences(prev => new Set(prev).add(reference.arxiv_id))
 				onGraphUpdate?.()
 			}
 		} catch (error) {
-			console.error("Failed to add paper:", error)
+			console.error("Failed to add reference:", error)
 		} finally {
-			setAddingCitation(null)
-			setCandidates(null)
+			setAddingReference(null)
 		}
 	}
 
@@ -111,56 +87,19 @@ const PaperTab = ({ paper, onGraphUpdate }: PaperTabProps) => {
 							</a>
 						</div>
 					</section>
-					{paper.citations && paper.citations.length > 0 && (
+					{paper.references && paper.references.length > 0 && (
 						<section className="mb-6">
 							<h2 className="text-sm font-semibold text-white/70 uppercase tracking-wide mb-3">
-								References ({paper.citations.length})
+								References ({paper.references.length})
 							</h2>
-							{candidates && (
-								<div className="mb-4 p-3 bg-white/5 rounded-lg border border-white/10">
-									<div className="flex items-center justify-between mb-2">
-										<span className="text-white/60 text-xs">Select the correct paper:</span>
-										<button
-											onClick={() => setCandidates(null)}
-											className="text-white/40 hover:text-white/60"
-										>
-											<X className="w-4 h-4" />
-										</button>
-									</div>
-									<div className="space-y-1">
-										{candidates.options.map(candidate => (
-											<button
-												key={candidate.arxiv_id}
-												onClick={() => handleSelectCandidate(candidate)}
-												disabled={addingCitation === candidate.arxiv_id}
-												className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm text-left hover:bg-white/5"
-											>
-												{addingCitation === candidate.arxiv_id ? (
-													<Loader2 className="w-3.5 h-3.5 animate-spin text-[#4A9D9A]" />
-												) : (
-													<ChevronRight className="w-3.5 h-3.5 text-[#4A9D9A]" />
-												)}
-												<div className="flex-1 min-w-0">
-													<div className="text-white/80 line-clamp-1">{candidate.title}</div>
-													<div className="text-white/40 text-xs">
-														{candidate.arxiv_id} ·{" "}
-														{candidate.authors.slice(0, 2).join(", ")} · {candidate.year}
-													</div>
-												</div>
-											</button>
-										))}
-									</div>
-								</div>
-							)}
 							<div className="space-y-1.5">
-								{paper.citations.map((citation, idx) => {
-									const citationKey = citation.arxiv_id || citation.title
-									const isAdding = addingCitation === citationKey
-									const isAdded = addedCitations.has(citationKey)
+								{paper.references.map((reference, idx) => {
+									const isAdding = addingReference === reference.arxiv_id
+									const isAdded = addedReferences.has(reference.arxiv_id)
 									return (
 										<button
 											key={idx}
-											onClick={() => handleAddCitation(citation)}
+											onClick={() => handleAddReference(reference)}
 											disabled={isAdding || isAdded}
 											className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm text-left transition-colors ${
 												isAdded ? "opacity-50" : "hover:bg-white/5"
@@ -174,12 +113,10 @@ const PaperTab = ({ paper, onGraphUpdate }: PaperTabProps) => {
 												)}
 											</div>
 											<div className="flex-1 min-w-0">
-												<span className="text-white/80 line-clamp-1">{citation.title}</span>
-												{citation.arxiv_id && (
-													<span className="text-[#4A9D9A] text-xs font-mono ml-2">
-														{citation.arxiv_id}
-													</span>
-												)}
+												<span className="text-white/80 line-clamp-1">{reference.title}</span>
+												<span className="text-[#4A9D9A] text-xs font-mono ml-2">
+													{reference.arxiv_id}
+												</span>
 											</div>
 										</button>
 									)

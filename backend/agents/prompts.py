@@ -106,18 +106,22 @@ User message: {message}
 
 Paper title:"""
 
-RELATED_CITATION_EXTRACTION_PROMPT = """Analyze the references/bibliography section of this research paper PDF.
+RELATED_REFERENCE_EXTRACTION_PROMPT = """Analyze the references/bibliography section of this research paper PDF.
 
-Extract up to 15 of the most important cited papers. For each citation, extract:
-- The paper title (as accurately as possible)
-- The arXiv ID if present (format: XXXX.XXXXX, e.g., 1706.03762)
-- The first author's last name
+Extract up to 15 cited papers that have arXiv IDs.
 
-Return the citations in this exact format, one per line:
-TITLE: [paper title] | ARXIV: [arxiv id or "none"] | AUTHOR: [first author last name]
+Return a JSON array with objects containing:
+- "title": the paper title
+- "arxiv_id": the arXiv ID (format: XXXX.XXXXX, e.g., 1706.03762)
+- "author": the first author's last name
 
-IMPORTANT: Look carefully for arXiv IDs in the references - they often appear as "arXiv:1706.03762" or "arxiv.org/abs/1706.03762".
-Only include citations where you can extract at least the title. Skip any citations that are unclear."""
+Example output:
+[{"title": "Attention Is All You Need", "arxiv_id": "1706.03762", "author": "Vaswani"}]
+
+IMPORTANT:
+- Look carefully for arXiv IDs - they often appear as "arXiv:1706.03762" or "arxiv.org/abs/1706.03762"
+- ONLY include references that have a clear arXiv ID
+- Return ONLY the JSON array, no other text"""
 
 # =============================================================================
 # Crawl Agent Prompts

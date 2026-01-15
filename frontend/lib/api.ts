@@ -1,8 +1,8 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
-export interface Citation {
+export interface Reference {
 	title: string
-	arxiv_id?: string
+	arxiv_id: string // Required - only references with arXiv IDs are stored
 	author?: string
 }
 
@@ -14,7 +14,7 @@ export interface Paper {
 	published: string
 	pdf_url: string
 	key_concepts: string[]
-	citations: Citation[]
+	references: Reference[]
 }
 
 export interface Edge {
@@ -23,19 +23,10 @@ export interface Edge {
 	target_id: string
 }
 
-export interface PaperCandidate {
-	arxiv_id: string
-	title: string
-	authors: string[]
-	year: number
-	source_paper_id?: string
-}
-
 export interface ChatResponse {
 	message: string
 	graph_updated: boolean
 	papers_added: string[]
-	paper_candidates: PaperCandidate[]
 }
 
 export interface CytoscapeGraph {

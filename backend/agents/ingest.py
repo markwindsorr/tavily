@@ -1,10 +1,11 @@
 import arxiv
+import json
 from typing import List
 from tavily import TavilyClient
 from agents.base import invoke_bedrock, invoke_bedrock_with_pdf
-from agents.prompts import CONCEPT_EXTRACTION_PROMPT, PAPER_NAME_EXTRACTION_PROMPT, RELATED_CITATION_EXTRACTION_PROMPT
-from agents.utils import extract_arxiv_id, search_arxiv_by_name, download_pdf, parse_citations
-from models import Paper, PaperCandidate, Citation
+from agents.prompts import CONCEPT_EXTRACTION_PROMPT, PAPER_NAME_EXTRACTION_PROMPT, RELATED_REFERENCE_EXTRACTION_PROMPT
+from agents.utils import extract_arxiv_id, search_arxiv_by_name, download_pdf
+from models import Paper, PaperCandidate, Reference
 from storage import storage
 from config import TAVILY_API_KEY
 
@@ -22,31 +23,19 @@ def extract_key_concepts(title: str, abstract: str) -> List[str]:
     return concepts[:5]
 
 
-def extract_citations_from_pdf(pdf_url: str) -> List[Citation]:
+def extract_references_from_pdf(pdf_url: str) -> List[Reference]:
     try:
         pdf_bytes = download_pdf(pdf_url)
-        citation_text = invoke_bedrock_with_pdf(
-            RELATED_CITATION_EXTRACTION_PROMPT,
+        response = invoke_bedrock_with_pdf(
+            RELATED_REFERENCE_EXTRACTION_PROMPT,
             pdf_bytes,
             max_tokens=4000,
             temperature=0
         )
-        parsed = parse_citations(citation_text)
-        citations = []
-        for c in parsed[:10]:
-            title = c.get("title")
-            if not title:
-                continue
-
-            citations.append(Citation(
-                title=title,
-                arxiv_id=c.get("arxiv_id"),
-                author=c.get("author")
-            ))
-
-        return citations
+        refs = json.loads(response)
+        return [Reference(**r) for r in refs[:10]]
     except Exception as e:
-        print(f"Citation extraction failed: {e}")
+        print(f"Reference extraction failed: {e}")
         return []
 
 
@@ -59,7 +48,7 @@ def fetch_paper_from_arxiv(arxiv_id: str) -> Paper:
 
     paper = results[0]
     key_concepts = extract_key_concepts(paper.title, paper.summary)
-    citations = extract_citations_from_pdf(paper.pdf_url)
+    references = extract_references_from_pdf(paper.pdf_url)
 
     return Paper(
         id=paper.get_short_id(),
@@ -69,7 +58,7 @@ def fetch_paper_from_arxiv(arxiv_id: str) -> Paper:
         published=paper.published,
         pdf_url=paper.pdf_url,
         key_concepts=key_concepts,
-        citations=citations,
+        references=references,
     )
 
 

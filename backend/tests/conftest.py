@@ -34,7 +34,7 @@ def sample_paper():
         published=datetime(2017, 6, 12),
         pdf_url="https://arxiv.org/pdf/2401.12345.pdf",
         key_concepts=["transformers", "attention"],
-        citations=[]
+        references=[]
     )
 
 
@@ -48,7 +48,7 @@ def sample_paper_2():
         published=datetime(2018, 10, 11),
         pdf_url="https://arxiv.org/pdf/2401.54321.pdf",
         key_concepts=["transformers", "pre-training"],
-        citations=[]
+        references=[]
     )
 
 

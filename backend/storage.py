@@ -1,7 +1,7 @@
 from typing import List, Optional
 from datetime import datetime
 from supabase import create_client, Client
-from models import Paper, Edge, GraphData, Citation, ChatMessage, Role
+from models import Paper, Edge, GraphData, Reference, ChatMessage, Role
 from config import SUPABASE_URL, SUPABASE_KEY
 
 
@@ -19,7 +19,7 @@ class Storage:
             "published": paper.published.isoformat(),
             "pdf_url": paper.pdf_url,
             "key_concepts": paper.key_concepts,
-            "citations": [c.model_dump() for c in paper.citations],
+            "references": [r.model_dump() for r in paper.references],
         }
         self.client.table("papers").upsert(data).execute()
         return paper
@@ -76,8 +76,7 @@ class Storage:
         self.client.table("chat_history").delete().not_.is_("id", "null").execute()
 
     def _row_to_paper(self, row: dict) -> Paper:
-        raw_citations = row.get("citations") or []
-        citations = [Citation(**c) for c in raw_citations if isinstance(c, dict)]
+        references = [Reference(**r) for r in row.get("references") or []]
         return Paper(
             id=row["id"],
             title=row["title"],
@@ -86,7 +85,7 @@ class Storage:
             published=datetime.fromisoformat(row["published"].replace("Z", "+00:00")),
             pdf_url=row["pdf_url"],
             key_concepts=row.get("key_concepts", []),
-            citations=citations,
+            references=references,
         )
 
     def _row_to_edge(self, row: dict) -> Edge:

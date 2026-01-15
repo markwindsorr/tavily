@@ -47,27 +47,3 @@ def download_pdf(pdf_url: str) -> bytes:
     return response.content
 
 
-def parse_citations(citation_text: str) -> List[dict]:
-    citations = []
-    for line in citation_text.strip().split("\n"):
-        if not line.strip() or not line.startswith("TITLE:"):
-            continue
-
-        parts = {}
-        for part in line.split("|"):
-            part = part.strip()
-            if part.startswith("TITLE:"):
-                parts["title"] = part[6:].strip()
-            elif part.startswith("ARXIV:"):
-                arxiv_val = part[6:].strip().lower()
-                if arxiv_val and arxiv_val not in ("none", "n/a"):
-                    arxiv_id = extract_arxiv_id(arxiv_val)
-                    if arxiv_id:
-                        parts["arxiv_id"] = arxiv_id
-            elif part.startswith("AUTHOR:"):
-                parts["author"] = part[7:].strip()
-
-        if parts.get("title"):
-            citations.append(parts)
-
-    return citations

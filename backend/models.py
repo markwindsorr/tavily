@@ -5,9 +5,9 @@ from datetime import datetime
 Role = Literal["user", "assistant"]
 
 
-class Citation(BaseModel):
+class Reference(BaseModel):
     title: str
-    arxiv_id: Optional[str] = None
+    arxiv_id: str
     author: Optional[str] = None
 
 
@@ -19,7 +19,7 @@ class Paper(BaseModel):
     published: datetime
     pdf_url: str
     key_concepts: List[str] = []
-    citations: List[Citation] = []
+    references: List[Reference] = []
 
     @property
     def arxiv_url(self) -> str:
