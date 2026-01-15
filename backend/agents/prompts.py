@@ -40,18 +40,6 @@ User message: {message}
 
 Paper name:"""
 
-INGEST_CITATION_EXTRACTION_PROMPT = """Analyze the references/bibliography section of this research paper PDF.
-
-Extract ALL cited papers from the references section. For each citation, extract:
-- The paper title (as accurately as possible)
-- The first author's last name
-- The year of publication
-
-Return the citations in this exact format, one per line:
-TITLE: [paper title] | AUTHOR: [first author last name] | YEAR: [year]
-
-Only include citations where you can extract at least the title. Skip any that are unclear."""
-
 # =============================================================================
 # Answer Agent Prompts
 # =============================================================================
