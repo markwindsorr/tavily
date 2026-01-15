@@ -8,7 +8,7 @@ class TestRouteByIntent:
         assert route_by_intent({"intent": "add_paper"}) == "ingest"
         assert route_by_intent({"intent": "search_paper"}) == "search"
         assert route_by_intent({"intent": "find_related"}) == "related"
-        assert route_by_intent({"intent": "find_connections"}) == "citations"
+        assert route_by_intent({"intent": "find_connections"}) == "connections"
         assert route_by_intent({"intent": "extract"}) == "extract"
         assert route_by_intent({"intent": "crawl"}) == "crawl"
         assert route_by_intent({"intent": "map"}) == "map"
@@ -16,16 +16,16 @@ class TestRouteByIntent:
         assert route_by_intent({"intent": "unknown"}) == "answer"
 
 
-class TestShouldFindCitations:
+class TestShouldFindConnections:
     def test_with_papers(self):
-        from graph import should_find_citations
-        assert should_find_citations(
-            {"papers_added": [MagicMock()]}) == "citations"
+        from graph import should_find_connections
+        assert should_find_connections(
+            {"papers_added": [MagicMock()]}) == "connections"
 
     def test_without_papers(self):
-        from graph import should_find_citations
-        assert should_find_citations({"papers_added": []}) == "synthesis"
-        assert should_find_citations({}) == "synthesis"
+        from graph import should_find_connections
+        assert should_find_connections({"papers_added": []}) == "synthesis"
+        assert should_find_connections({}) == "synthesis"
 
 
 class TestCreateWorkflow:

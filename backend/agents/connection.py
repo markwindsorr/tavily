@@ -35,15 +35,15 @@ def find_concept_connections(
     return edges
 
 
-def citation_agent(state: dict) -> dict:
+def connection_agent(state: dict) -> dict:
     papers_added = state.get("papers_added", [])
     all_papers = storage.get_all_papers()
 
     if len(all_papers) < 2:
         return {
             **state,
-            "citation_edges": [],
-            "citation_message": "Need at least 2 papers to find connections."
+            "connection_edges": [],
+            "connection_message": "Need at least 2 papers to find connections."
         }
 
     existing_edges = {(e.source_id, e.target_id) for e in storage.get_edges()}
@@ -61,6 +61,6 @@ def citation_agent(state: dict) -> dict:
 
     return {
         **state,
-        "citation_edges": all_edges,
-        "citation_message": f"Found {len(all_edges)} connections based on shared concepts." if all_edges else "No shared concepts found between papers."
+        "connection_edges": all_edges,
+        "connection_message": f"Found {len(all_edges)} connections based on shared concepts." if all_edges else "No shared concepts found between papers."
     }

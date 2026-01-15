@@ -133,7 +133,7 @@ async def chat(request: ChatRequest):
         result = run_pipeline(request.message)
         message = result.get("final_response", "I processed your request.")
         papers_added = [p.id for p in result.get("papers_added", [])]
-        graph_updated = bool(papers_added) or bool(result.get("citation_edges", []))
+        graph_updated = bool(papers_added) or bool(result.get("connection_edges", []))
         paper_candidates = result.get("paper_candidates", [])
 
         response = ChatResponse(

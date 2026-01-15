@@ -1,6 +1,6 @@
 from langgraph.graph import StateGraph, END
 from state import ResearchGraphState
-from agents import router_agent, ingest_agent, citation_agent, answer_agent, synthesis_agent
+from agents import router_agent, ingest_agent, connection_agent, answer_agent, synthesis_agent
 from agents.ingest import search_papers_agent
 from agents.related import find_related_agent
 from agents.extract import extract_agent
@@ -17,7 +17,7 @@ def route_by_intent(state: ResearchGraphState) -> str:
     elif intent == "find_related":
         return "related"
     elif intent == "find_connections":
-        return "citations"
+        return "connections"
     elif intent == "extract":
         return "extract"
     elif intent == "crawl":
@@ -28,10 +28,10 @@ def route_by_intent(state: ResearchGraphState) -> str:
         return "answer"
 
 
-def should_find_citations(state: ResearchGraphState) -> str:
+def should_find_connections(state: ResearchGraphState) -> str:
     papers_added = state.get("papers_added", [])
     if papers_added:
-        return "citations"
+        return "connections"
     else:
         return "synthesis"
 
@@ -44,7 +44,7 @@ def create_workflow() -> StateGraph:
     workflow.add_node("ingest", ingest_agent)
     workflow.add_node("search", search_papers_agent)
     workflow.add_node("related", find_related_agent)
-    workflow.add_node("citations", citation_agent)
+    workflow.add_node("connections", connection_agent)
     workflow.add_node("answer", answer_agent)
     workflow.add_node("extract", extract_agent)
     workflow.add_node("crawl", crawl_agent)
@@ -60,7 +60,7 @@ def create_workflow() -> StateGraph:
             "ingest": "ingest",
             "search": "search",
             "related": "related",
-            "citations": "citations",
+            "connections": "connections",
             "answer": "answer",
             "extract": "extract",
             "crawl": "crawl",
@@ -70,16 +70,16 @@ def create_workflow() -> StateGraph:
 
     workflow.add_conditional_edges(
         "ingest",
-        should_find_citations,
+        should_find_connections,
         {
-            "citations": "citations",
+            "connections": "connections",
             "synthesis": "synthesis",
         }
     )
 
     workflow.add_edge("search", "synthesis")
     workflow.add_edge("related", "synthesis")
-    workflow.add_edge("citations", "synthesis")
+    workflow.add_edge("connections", "synthesis")
     workflow.add_edge("answer", "synthesis")
     workflow.add_edge("extract", "synthesis")
     workflow.add_edge("crawl", "synthesis")
@@ -99,7 +99,7 @@ def run_pipeline(user_message: str) -> dict:
     initial_state: ResearchGraphState = {
         "user_message": user_message,
         "papers_added": [],
-        "citation_edges": [],
+        "connection_edges": [],
     }
     result = app.invoke(initial_state)
 

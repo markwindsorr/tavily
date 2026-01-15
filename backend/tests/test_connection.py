@@ -3,17 +3,17 @@ from datetime import datetime
 from models import Paper
 
 
-class TestCitationAgent:
+class TestConnectionAgent:
     def test_needs_at_least_two_papers(self):
-        with patch("agents.citation.storage") as mock_storage:
+        with patch("agents.connection.storage") as mock_storage:
             mock_storage.get_all_papers.return_value = [MagicMock()]
-            from agents.citation import citation_agent
-            result = citation_agent({"papers_added": []})
-            assert result["citation_edges"] == []
-            assert "at least 2 papers" in result["citation_message"]
+            from agents.connection import connection_agent
+            result = connection_agent({"papers_added": []})
+            assert result["connection_edges"] == []
+            assert "at least 2 papers" in result["connection_message"]
 
     def test_finds_shared_concepts(self):
-        with patch("agents.citation.storage") as mock_storage:
+        with patch("agents.connection.storage") as mock_storage:
             paper1 = Paper(
                 id="paper1", title="Paper One", authors=["A"], summary="S",
                 published=datetime(2024, 1, 1), pdf_url="url",
@@ -28,12 +28,12 @@ class TestCitationAgent:
             mock_storage.get_edges.return_value = []
             mock_storage.add_edge.side_effect = lambda e: e
 
-            from agents.citation import citation_agent
-            result = citation_agent({"papers_added": [paper1]})
-            assert len(result["citation_edges"]) == 1
+            from agents.connection import connection_agent
+            result = connection_agent({"papers_added": [paper1]})
+            assert len(result["connection_edges"]) == 1
 
     def test_no_shared_concepts(self):
-        with patch("agents.citation.storage") as mock_storage:
+        with patch("agents.connection.storage") as mock_storage:
             paper1 = Paper(
                 id="paper1", title="Paper One", authors=["A"], summary="S",
                 published=datetime(2024, 1, 1), pdf_url="url",
@@ -47,6 +47,6 @@ class TestCitationAgent:
             mock_storage.get_all_papers.return_value = [paper1, paper2]
             mock_storage.get_edges.return_value = []
 
-            from agents.citation import citation_agent
-            result = citation_agent({"papers_added": [paper1]})
-            assert result["citation_edges"] == []
+            from agents.connection import connection_agent
+            result = connection_agent({"papers_added": [paper1]})
+            assert result["connection_edges"] == []

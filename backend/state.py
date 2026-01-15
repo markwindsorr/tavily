@@ -22,8 +22,8 @@ class ResearchGraphState(TypedDict, total=False):
     papers_added: List[Paper]
     paper_candidates: List[PaperCandidate]
 
-    citation_edges: List[Edge]
-    citation_message: str
+    connection_edges: List[Edge]
+    connection_message: str
 
     extracted_url: Optional[str]
     extracted_arxiv_id: Optional[str]

@@ -37,8 +37,8 @@ def build_response_message(state: dict) -> str:
 
     if state.get("response"):
         parts.append(state["response"])
-    if state.get("citation_message"):
-        parts.append(state["citation_message"])
+    if state.get("connection_message"):
+        parts.append(state["connection_message"])
     if state.get("error"):
         parts.append(f"Note: {state['error']}")
 
